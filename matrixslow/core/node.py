@@ -18,10 +18,10 @@ class Node(abc.ABC):
         self.need_save = kargs.get('need_save', True)
         self.gen_node_name(**kargs)
 
-        self.parents = list(parents) # 父节点列表
-        self.children = [] # 子节点列表
-        self.value = None # 本节点的值
-        self.jacobi = None # 结果节点对本节点的雅可比矩阵
+        self.parents = list(parents)  # 父节点列表
+        self.children = []  # 子节点列表
+        self.value = None  # 本节点的值
+        self.jacobi = None  # 结果节点对本节点的雅可比矩阵
 
         # 将本节点添加到父节点的子节点列表中
         for parent in self.parents:
@@ -56,10 +56,11 @@ class Node(abc.ABC):
         前向传播计算本节点的值，若父节点的值未被计算，则递归调用父节点的forward
         方法
         """
-        for node in self.parents:
-            if node.value is None:
-                node.forward()
-                self.compute()
+        for parent in self.parents:
+            if parent.value is None:
+                parent.forward()
+
+        self.compute()
 
     @abc.abstractmethod
     def compute(self):
@@ -86,7 +87,8 @@ class Node(abc.ABC):
                 )
                 for child in self.get_children():
                     if child.value is not None:
-                        self.jacobi += child.backward(result) * child.get_jacobi(self)
+                        self.jacobi += child.backward(result) \
+                            * child.get_jacobi(self)
 
         return self.jacobi
 
@@ -100,7 +102,7 @@ class Node(abc.ABC):
         """
         返回本节点的值展开成向量后的维数
         """
-        return self.value.shape[0] * self.value.shpae[1]
+        return self.value.shape[0] * self.value.shape[1]
 
     def shape(self):
         """
@@ -117,15 +119,16 @@ class Node(abc.ABC):
             for child in self.children:
                 child.reset_value()
 
+
 class Variable(Node):
     """
-    变量节点
+    变量节点，没有父节点
     """
     def __init__(self, dim, init=False, trainable=True, **kargs):
         """
         变量节点没有父节点，其构造函数接受变量节点的形状、是否初始化以及是否参与训练的标识
         """
-        super().__init__(self, **kargs)
+        super().__init__(**kargs)
         self.dim = dim
 
         # 如果需要初始化，则以正态分布随机初始化变量的值

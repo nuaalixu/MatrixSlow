@@ -5,7 +5,7 @@
 import numpy as np
 
 from ..core import Node
-from ..ops import Softmax
+from ..ops import SoftMax
 
 
 class LossFunction(Node):
@@ -24,7 +24,7 @@ class PerceptionLoss(LossFunction):
         self.value = np.mat(np.where(
             self.parents[0].value >= 0.0, 0.0, -self.parents[0].value
         ))
-    
+
     def get_jacobi(self, parent):
         """
         雅克比矩阵为对角阵，每个对角线元素对应一个父节点元素。若父节点元素大于0，则
