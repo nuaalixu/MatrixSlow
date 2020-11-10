@@ -115,11 +115,11 @@ class Optimizer(abc.ABC):
 
 class GradientDescent(Optimizer):
     """
-    梯度下降优化器
+    朴素梯度下降优化器
     """
 
     def __init__(self, graph, target, learning_rate=0.01):
-        super().__init__(self, graph, target)
+        super().__init__(graph, target)
         self.learning_rate = learning_rate
 
     def _update(self):
@@ -133,3 +133,135 @@ class GradientDescent(Optimizer):
 
                 # 用朴素梯度下降法更新变量节点的值
                 node.set_value(node.value - self.learning_rate * gradient)
+
+
+class Momentum(Optimizer):
+    """
+    动量法
+    """
+
+    def __init__(self, graph, target, learning_rate=0.01, momentum=0.9):
+        super().__init__(graph, target)
+        self.learning_rate = learning_rate
+        # 动量系数，默认为0.9
+        self.momentum = momentum
+        # 积累历史速度的字典
+        self.v = dict()
+
+    def _update(self):
+        """
+        momentum梯度下降法
+        """
+        for node in self.graph.nodes:
+            if isinstance(node, Variable) and node.trainable:
+                # 取得该节点当前批的平均梯度
+                gradient = self.get_gradient(node)
+
+                if node not in self.v:
+                    self.v[node] = gradient
+                else:
+                    # 滑动平均累计历史速度
+                    self.v[node] = self.momentum * self.v[node] \
+                                   - self.learning_rate * gradient
+
+            # 更新变量节点的值
+            node.set_value(node.value + self.v[node])
+
+
+class AdaGrad(Optimizer):
+    """
+    AdaGrad优化器
+    """
+
+    def __init__(self, graph, target, learning_rate=0.01):
+        super().__init__(graph, target)
+        self.learning_rate = learning_rate
+        # s用于存储各节点历史梯度的平方
+        self.s = dict()
+
+    def _update(self):
+        """
+        AdaGrad梯度下降法更新参数
+        """
+        for node in self.graph.nodes:
+            if isinstance(node, Variable) and node.trainable:
+                # 取得该节点在当前批的平均梯度
+                gradient = self.get_gradient(node)
+                # 累积梯度各分量的平方和
+                if node not in self.s:
+                    self.s[node] = np.power(gradient, 2)
+                else:
+                    self.s[node] = self.s[node] + np.power(gradient, 2)
+                # 更新变量节点的值
+                node.set_value(node.value - self.learning_rate
+                               * gradient / (np.sqrt(self.s[node] + 1e-10)))
+
+
+class RMSProp(Optimizer):
+    """
+    Root Mean Square Propagation（RMSProp）优化器
+    """
+
+    def __init__(self, graph, target, learning_rate=0.01, beta=0.9):
+        super().__init__(graph, target)
+        self.learning_rate = learning_rate
+        # 衰减系数
+        assert 0.0 < beta < 1.0
+        self.beta = beta
+        # s用于存储各节点历史梯度的平方
+        self.s = dict()
+
+    def _update(self):
+        for node in self.graph.nodes:
+            if isinstance(node, Variable) and node.trainable:
+                # 取得该节点在当前批的平均梯度
+                gradient = self.get_gradient(node)
+
+                # 滑动加权累积梯度各分量的平方和
+                if node not in self.s:
+                    self.s[node] = np.power(gradient, 2)
+                else:
+                    self.s[node] = self.beta * self.s[node] + \
+                        (1 - self.beta) * np.power(gradient, 2)
+                # 更新变量节点的值
+                node.set_value(node.value - self.learning_rate
+                               * gradient / np.sqrt(self.s[node] + 1e-10))
+
+
+class Adam(Optimizer):
+    """
+    Adaptive Moment Estimation（Adam）优化器
+    """
+
+    def __init__(self, graph, target,
+                 learning_rate=0.01, beta_1=0.9, beta_2=0.99):
+        super().__init__(graph, target, target)
+        self.learning_rate = learning_rate
+        # 历史梯度衰减系数
+        assert 0.0 < beta_1 < 1.0
+        self.beta_1 = beta_1
+        # 历史梯度各分量平方衰减系数
+        assert 0.0 < beta_2 < 1.0
+        self.beta_2 = beta_2
+        # 历史梯度累积
+        self.v = dict()
+        # 历史梯度各分量平方累积
+        self.s = dict()
+
+    def _update(self):
+        for node in self.graph.nodes:
+            if isinstance(node, Variable) and node.trainable:
+                # 取得该节点在当前批的平均梯度
+                gradient = self.get_gradient(node)
+                if node not in self.s:
+                    self.v[node] = gradient
+                    self.s[node] = np.power(gradient, 2)
+                else:
+                    # 梯度累积
+                    self.v[node] = self.beta_1 * self.v[node] \
+                        + (1 - self.beta_1) * gradient
+                    # 各分量平方累积
+                    self.s[node] = self.beta_2 * self.s[node] \
+                        + (1 - self.beta_2) * np.power(gradient, 2)
+                node.set_value(node.value - self.learning_rate
+                               * self.v[node] / np.sqrt(self.s[node] + 1e-10))
