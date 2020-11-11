@@ -32,3 +32,20 @@ class PerceptionLoss(LossFunction):
         """
         diag = np.where(parent.value >= 0.0, 0.0, -1)
         return np.diag(diag.ravel())
+
+
+class CrossEntropyWithSoftMax(LossFunction):
+    """
+    对第一个父节点施加SoftMax之后，再以第二个父节点为标签One-Hot向量计算交叉熵
+    """
+
+    def compute(self):
+        self.prob = SoftMax.softmax(self.parents[0].value)
+        self.value = np.mat(-np.sum(np.multiply(self.parents[1].value,
+                                                np.log(self.prob + 1e-10))))
+
+    def get_jacobi(self, parent):
+        if parent is self.parens[0]:
+            return (self.prob - self.parents[1].value).T
+        else:
+            return (-np.log(self.prob + 1e-10)).T
