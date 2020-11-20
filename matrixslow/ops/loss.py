@@ -49,3 +49,17 @@ class CrossEntropyWithSoftMax(LossFunction):
             return (self.prob - self.parents[1].value).T
         else:
             return (-np.log(self.prob + 1e-10)).T
+
+
+class LogLoss(LossFunction):
+
+    def compute(self):
+        assert len(self.parents) == 1
+        x = self.parents[0].value
+        self.value = np.log(1 + np.power(np.e, np.where(-x > 1e2, 1e2, -x)))
+
+    def get_jacobi(self, parent):
+        x = parent.value
+        diag = -1 / (1 + np.power(np.e, np.where(x > 1e2, 1e2, x)))
+
+        return np.diag(diag.ravel())
