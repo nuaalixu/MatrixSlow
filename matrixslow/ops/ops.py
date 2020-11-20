@@ -295,3 +295,81 @@ class MaxPooling(Operator):
     def get_jacobi(self, parent):
         assert parent is self.parents[0] and self.jacobi is not None
         return self.flag
+
+
+class Concat(Operator):
+    """
+    将多个父节点的值连接成向量
+    """
+
+    def compute(self):
+        assert len(self.paretns) > 0
+
+        # 将所有父节点矩阵展开并连接成一个向量
+        self.value = np.concatenate(
+            [p.value.flatten() for p in self.parents],
+            axis=1).T
+
+    def get_jacobi(self, parent):
+        assert parent in self.parents
+
+        dimensions = [p.dimension() for p in self.parents]  # 各个父节点的元素数量
+        pos = self.parents.index(parent)  # 当前是第几个父节点
+        dimension = parent.dimension()  # 当前父节点的元素数量
+
+        assert dimension == dimensions[pos]
+
+        jacobi = np.mat(np.zeros((self.dimension(), dimension)))
+        start_row = int(np.sum(dimensions[:pos]))
+        jacobi[start_row:start_row + dimension,
+               0:dimension] = np.eye(dimension)
+
+        return jacobi
+
+
+class ScalarMultiply(Operator):
+    """
+    用标量（1x1矩阵）数乘一个矩阵
+    """
+
+    def compute(self):
+        assert self.parents[0].shape == (1, 1)  # 第一个父节点是标量
+        self.value = np.multiply(self.parents[0].value, self.parents[1].value)
+
+    def get_jacobi(self, parent):
+
+        assert parent in self.parents
+
+        if parent is self.parents[0]:
+            return self.parents[1].value.flatten().T
+        else:
+            return np.mat(np.eye(self.parents[1].dimension())) \
+                * self.parents[0].value[0, 0]
+
+
+class Welding(Operator):
+    """
+    提供焊接操作，将本节点的父节点更换为指定节点
+    """
+
+    def compute(self):
+        assert len(self.parents) == 1 and self.parents[0] is not None
+        self.value = self.parents[0].value
+
+    def get_jacobi(self, parent):
+        assert parent is self.parents[0]
+        return np.mat(np.eye(self.dimension()))
+
+    def weld(self, node):
+        """
+        将本节点焊接到输入节点上
+        """
+        # 首先与之前的父节点断开
+        if len(self.parents) == 1 and self.parents[0] is not None:
+            self.parents[0].children.remove(self)
+
+        self.parents.clear()
+
+        # 与输入节点焊接
+        self.parents.append(node)
+        node.children.append(self)
