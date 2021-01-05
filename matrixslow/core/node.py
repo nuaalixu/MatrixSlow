@@ -1,7 +1,6 @@
 """
 基本节点模块
 """
-
 import abc
 import numpy as np
 
