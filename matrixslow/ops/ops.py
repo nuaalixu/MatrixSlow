@@ -106,7 +106,7 @@ class Step(Operator):
         return np.mat(np.zeros((self.dimension, self.dimension)))
 
 
-class logistic(Operator):
+class Logistic(Operator):
     """
     对向量的分量施加Logistic函数
     """
