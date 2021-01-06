@@ -1,8 +1,11 @@
 """
 神经网络层
 """
-from ..core import *
-from ..ops import *
+import numpy as np
+
+from ..core import Variable
+from ..ops import (Convolve, Add, ScalarMultiply, ReLU,
+                   Logistic, MaxPooling, MatMul)
 
 
 def conv(feature_maps, input_shape, kernels, kernel_shape, activation):
@@ -15,23 +18,24 @@ def conv(feature_maps, input_shape, kernels, kernel_shape, activation):
         kernels: int, 卷积层的卷积核数量.
         kernel_shape: tuple, 卷积核的形状（宽和高）.
         activation: str, 激活函数类型.
-    
+
     Returns:
         list, 包含多个输出特征图.
     """
     ones = Variable(input_shape, init=False, trainable=False)
     ones.set_value(np.mat(np.ones(input_shape)))
 
-    output = []
+    outputs = []
     for i in range(kernels):
         channels = []
         for fm in feature_maps:
             kernel = Variable(kernel_shape, init=True, trainable=True)
             conv = Convolve(fm, kernel)
             channels.append(conv)
-        
+
         channels = Add(*channels)
-        bias = ScalarMultiply(Variable((1, 1), init=True, trainable=True), ones)
+        bias = ScalarMultiply(Variable((1, 1), init=True, trainable=True),
+                              ones)
         affine = Add(channels, bias)
 
         if activation == 'ReLU':
@@ -40,6 +44,10 @@ def conv(feature_maps, input_shape, kernels, kernel_shape, activation):
             outputs.append(Logistic(affine))
         else:
             raise ValueError(f'Activation {activation} is not defined.')
+
+    assert len(outputs) == kernels
+    return outputs
+
 
 def pooling(feature_maps, kernel_shape, stride):
     """
@@ -80,12 +88,5 @@ def fc(input, input_size, size, activation):
         return ReLU(affine)
     elif activation == 'Logistic':
         return Logistic(affine)
-    elif activation == 'SoftMax':
-        return SoftMax(affine)
-    elif activation == 'Step':
-        return Step(affine)
     else:
         raise ValueError(f'Activation {activation} is not defined.')
-
-    assert len(outputs) == kernels
-    return outputs
