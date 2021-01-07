@@ -42,6 +42,8 @@ def conv(feature_maps, input_shape, kernels, kernel_shape, activation):
             outputs.append(ReLU(affine))
         elif activation == 'Logistic':
             outputs.append(Logistic(affine))
+        elif activation is None:
+            outputs.append(affine)
         else:
             raise ValueError(f'Activation {activation} is not defined.')
 
@@ -88,5 +90,7 @@ def fc(input, input_size, size, activation):
         return ReLU(affine)
     elif activation == 'Logistic':
         return Logistic(affine)
+    elif activation is None:
+        return affine
     else:
         raise ValueError(f'Activation {activation} is not defined.')

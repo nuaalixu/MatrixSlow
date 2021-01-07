@@ -19,7 +19,7 @@ X, y = X[:5000] / 255, y.astype(np.int)[:5000]
 
 # 将整数形式的标签转换成One-Hot编码
 oh = OneHotEncoder(sparse=False)
-one_hot_label = oh.fit_transform(y.reshape(-1, 1))
+one_hot_label = oh.fit_transform(y.values.reshape(-1, 1))
 
 
 # 构造计算图：输入向量，是一个784x1矩阵，不需要初始化，不参与训练
@@ -62,7 +62,7 @@ for epoch in range(30):
     for i in range(len(X)):
         
         # 取第i个样本，构造784x1矩阵对象
-        feature = np.mat(X[i]).T
+        feature = np.mat(X.to_numpy()[i]).T
         
         # 取第i个样本的One-Hot标签，10x1矩阵
         label = np.mat(one_hot_label[i]).T
@@ -95,7 +95,7 @@ for epoch in range(30):
     # 遍历训练集，计算当前模型对每个样本的预测值
     for i in range(len(X)):
                 
-        feature = np.mat(X[i]).T
+        feature = np.mat(X.to_numpy()[i]).T
         x.set_value(feature)
         
         # 在模型的predict节点上执行前向传播
