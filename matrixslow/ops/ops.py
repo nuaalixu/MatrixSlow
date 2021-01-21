@@ -303,7 +303,7 @@ class Concat(Operator):
     """
 
     def compute(self):
-        assert len(self.paretns) > 0
+        assert len(self.parents) > 0
 
         # 将所有父节点矩阵展开并连接成一个向量
         self.value = np.concatenate(
