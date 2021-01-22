@@ -13,7 +13,7 @@ import matrixslow as ms
 from scipy import signal
 
 
-# 构造正弦波和方波两类样本的函数 
+# 构造正弦波和方波两类样本的函数
 def get_sequence_data(dimension=10, length=10,
                       number_of_examples=1000, train_set_ratio=0.7, seed=42):
     """
