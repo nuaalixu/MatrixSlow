@@ -195,7 +195,7 @@ class Convolve(Operator):
         pw, ph = tuple(np.add(data.shape, np.multiply((hkw, hkh), 2)))
         self.padded = np.mat(np.zeros((pw, ph)))
         self.padded[hkw:hkw + w, hkh:hkh + h] = data
-        self.value = np.mat(np.zeros(w, h))
+        self.value = np.mat(np.zeros((w, h)))
 
         # 二维离线卷积
         for i in np.arange(hkw, hkw + w):
