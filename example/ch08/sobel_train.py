@@ -5,6 +5,7 @@ Created on Fri Mar 20 11:34:01 2020
 @author: zhangjuefei
 """
 
+import os
 import sys
 sys.path.append('../..')
 
@@ -14,7 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 
 # 读取图像，归一化
-pic = matplotlib.image.imread('data/lena.jpg') / 255
+pic = matplotlib.image.imread(os.path.abspath('../../data/lena.jpg')) / 255
 
 # 图像尺寸
 w, h = pic.shape
@@ -59,7 +60,7 @@ mse = ms.ops.MatMul(square_error, n)
 optimizer = ms.optimizer.Adam(ms.core.default_graph, mse, 0.01)
 
 # 训练
-for i in range(1000):
+for i in range(100):
     
     optimizer.one_step()
     optimizer.update()               
@@ -74,3 +75,4 @@ print(filter_train.value)
 # 用被训练的滤波器滤波图像
 filter_output.forward()
 plt.imshow(filter_output.value, cmap="gray")
+plt.show()  # 显示图像

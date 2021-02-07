@@ -212,7 +212,7 @@ class Convolve(Operator):
         kernel = self.parents[1].value
 
         w, h = data.shape
-        kw, kh = kernel.to_shape
+        kw, kh = kernel.shape
         hkw, hkh = int(kw / 2), int(kh / 2)
 
         pw, ph = tuple(np.add(data.shape, np.multiply((hkw, hkh), 2)))
@@ -272,7 +272,7 @@ class MaxPooling(Operator):
             for j in np.arange(0, h, sh):
                 # 取池化窗口中的最大值
                 top, bottom = max(0, i - hkw), min(w, i + hkw + 1)
-                left, right = max(0, i - hkh), min(h, j + hkh + 1)
+                left, right = max(0, j - hkh), min(h, j + hkh + 1)
                 window = data[top:bottom, left:right]
                 row.append(np.max(window))
 
@@ -333,7 +333,7 @@ class ScalarMultiply(Operator):
     """
 
     def compute(self):
-        assert self.parents[0].shape == (1, 1)  # 第一个父节点是标量
+        assert self.parents[0].shape() == (1, 1)  # 第一个父节点是标量
         self.value = np.multiply(self.parents[0].value, self.parents[1].value)
 
     def get_jacobi(self, parent):

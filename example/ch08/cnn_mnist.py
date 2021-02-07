@@ -19,7 +19,7 @@ X, y = X[:1000] / 255, y.astype(np.int)[:1000]
 
 # 将整数形式的标签转换成One-Hot编码
 oh = OneHotEncoder(sparse=False)
-one_hot_label = oh.fit_transform(y.reshape(-1, 1))
+one_hot_label = oh.fit_transform(y.values.reshape(-1, 1))
 
 # 输入图像尺寸
 img_shape = (28, 28)
@@ -70,7 +70,7 @@ for epoch in range(60):
     
     for i in range(len(X)):
         
-        feature = np.mat(X[i]).reshape(img_shape)
+        feature = np.mat(X.values[i]).reshape(img_shape)
         label = np.mat(one_hot_label[i]).T
         
         x.set_value(feature)
