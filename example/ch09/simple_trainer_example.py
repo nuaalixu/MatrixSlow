@@ -27,7 +27,7 @@ X = np.reshape(np.array(X), (1000, 28, 28))
 
 # 将整数形式的标签转换成One-Hot编码
 oh = OneHotEncoder(sparse=False)
-one_hot_label = oh.fit_transform(y.reshape(-1, 1))
+one_hot_label = oh.fit_transform(y.values.reshape(-1, 1))
 
 # 输入图像尺寸
 img_shape = (28, 28)
@@ -66,7 +66,7 @@ loss = ms.ops.loss.CrossEntropyWithSoftMax(output, one_hot)
 learning_rate = 0.005
 
 # 优化器
-optimizer = ms.optimizer.Adam(ms.default_graph, loss, learning_rate)
+optimizer = ms.optimizer.Momentum(ms.default_graph, loss, learning_rate)
 
 
 # 批大小

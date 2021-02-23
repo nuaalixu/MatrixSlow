@@ -83,7 +83,7 @@ class Optimizer(abc.ABC):
         # 执行更新
         self._update()
 
-        # 清楚累加梯度
+        # 清除累加梯度
         self.acc_gradient.clear()
         self.acc_no = 0
 
@@ -164,8 +164,8 @@ class Momentum(Optimizer):
                     self.v[node] = self.momentum * self.v[node] \
                                    - self.learning_rate * gradient
 
-            # 更新变量节点的值
-            node.set_value(node.value + self.v[node])
+                # 更新变量节点的值
+                node.set_value(node.value + self.v[node])
 
 
 class AdaGrad(Optimizer):
