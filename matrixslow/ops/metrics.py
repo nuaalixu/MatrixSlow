@@ -142,7 +142,7 @@ class ROC(Metrics):
     """
 
     def __init__(self, *parents, **kargs):
-        super().__init__(self, *parents, **kargs)
+        super().__init__(*parents, **kargs)
 
     def init(self):
         self.count = 100
@@ -222,7 +222,7 @@ class ROC_AUC(Metrics):
 
         # 使用这个数量，除以m x n
         self.value = count / self.total
-        return "{self.__class__.__name__}: f{self.value:.4f}"
+        return f"{self.__class__.__name__}: {self.value:.4f} "
 
 
 class F1Score(Metrics):

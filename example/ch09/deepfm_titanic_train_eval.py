@@ -132,7 +132,7 @@ roc = ms.ops.metrics.ROC(output, label)
 auc = ms.ops.metrics.ROC_AUC(output, label)
 
 trainer = SimpleTrainer([x, x_Pclass, x_Sex, x_Embarked], label,
-                        loss, optimizer, epoches=20, batch=16, eval_on_train=True, metrics_ops=[auc])
+                        loss, optimizer, epoches=10, batch=16, eval_on_train=True, metrics_ops=[roc])
 
 train_inputs = {
     x.name: features,
