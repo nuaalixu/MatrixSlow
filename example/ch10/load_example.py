@@ -43,6 +43,6 @@ for index in range(len(test_data)):
     x.set_value(np.mat(test_data[index]).T)
     # 执行前向传播，计算输出节点的值，即模型预测概率
     pred.forward()
-    gt = test_label[index]
+    gt = test_label.values[index]
     print('model predict {} and ground truth: {}'.format(
         np.argmax(pred.value), gt))

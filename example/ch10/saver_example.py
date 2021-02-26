@@ -16,7 +16,7 @@ from sklearn.datasets import fetch_openml
 from sklearn.preprocessing import OneHotEncoder
 import matrixslow as ms
 from matrixslow.trainer import SimpleTrainer
-from matrixslow_serving.exporter import Exporter
+# from matrixslow_serving.exporter import Exporter
 
 
 # 加载MNIST数据集，取一部分样本并归一化
@@ -25,12 +25,12 @@ from matrixslow_serving.exporter import Exporter
 img_shape = (28, 28)
 
 X, y = fetch_openml('mnist_784', version=1, return_X_y=True, cache=True)
-X, y = X[:1000] / 255, y.astype(np.int)[:1000]
-X = np.reshape(np.array(X), (1000, *img_shape))
+X, y = X[:100] / 255, y.astype(np.int)[:100]
+X = np.reshape(np.array(X), (100, *img_shape))
 
 # 将整数形式的标签转换成One-Hot编码
 oh = OneHotEncoder(sparse=False)
-one_hot_label = oh.fit_transform(y.reshape(-1, 1))
+one_hot_label = oh.fit_transform(y.values.reshape(-1, 1))
 
 
 # 输入图像
@@ -55,7 +55,7 @@ pooling2 = ms.layer.pooling(conv2, (3, 3), (2, 2))
 fc1 = ms.layer.fc(ms.ops.Concat(*pooling2), 147, 120, "ReLU")
 
 # 输出层
-output = ms.layer.fc(fc1, 120, 10, "None")
+output = ms.layer.fc(fc1, 120, 10, None)
 
 # 分类概率
 predict = ms.ops.SoftMax(output, name='softmax_output')
@@ -78,9 +78,9 @@ trainer = SimpleTrainer(
 
 trainer.train_and_eval({x.name: X}, one_hot_label, {x.name: X}, one_hot_label)
 
-exporter = Exporter()
-sig = exporter.signature('img_input', 'softmax_output')
+# exporter = Exporter()
+# sig = exporter.signature('img_input', 'softmax_output')
 
 saver = ms.trainer.Saver('./epoches10')
 saver.save(model_file_name='my_model.json',
-           weights_file_name='my_weights.npz', service_signature=sig)
+           weights_file_name='my_weights.npz', service_signature=None)

@@ -1,6 +1,11 @@
+"""基本节点模块。
+节点有以下几个类型：
+    1. Variable，变量节点。其没有父节点，作为模型权重（可训练）或输入数据（不可训练）。
+    2. Operator，操作节点。其表示某种运算操作，通常为计算图的中间变量。
+    3. LossFunction，损失函数节点。
+    4. Metrics，评估节点。其仅进行前向计算，用于评估模型。
 """
-基本节点模块
-"""
+
 import abc
 import numpy as np
 
@@ -13,6 +18,7 @@ class Node(abc.ABC):
     """
     def __init__(self, *parents, **kargs):
         # 计算图对象，默认为全局对象 default_graph
+        self.kargs = kargs
         self.graph = kargs.get('graph', default_graph)
         self.need_save = kargs.get('need_save', True)
         self.gen_node_name(**kargs)
