@@ -45,7 +45,7 @@ class Metrics(Node):
         raise NotImplementedError()
 
     def value_str(self):
-        return f"{self.__class__.__name__}: {self.value:.4f}"
+        return f" {self.__class__.__name__}: {self.value:.4f}"
 
 
 class Accuracy(Metrics):

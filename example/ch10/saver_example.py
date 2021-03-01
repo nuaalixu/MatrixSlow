@@ -83,4 +83,4 @@ sig = exporter.signature('img_input', 'softmax_output')
 
 saver = ms.trainer.Saver('./epoches10')
 saver.save(model_file_name='my_model.json',
-           weights_file_name='my_weights.npz', service_signature=None)
+           weights_file_name='my_weights.npz', service_signature=sig)
