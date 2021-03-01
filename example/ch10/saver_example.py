@@ -16,7 +16,7 @@ from sklearn.datasets import fetch_openml
 from sklearn.preprocessing import OneHotEncoder
 import matrixslow as ms
 from matrixslow.trainer import SimpleTrainer
-# from matrixslow_serving.exporter import Exporter
+from matrixslow_serving.exporter import Exporter
 
 
 # 加载MNIST数据集，取一部分样本并归一化
@@ -78,8 +78,8 @@ trainer = SimpleTrainer(
 
 trainer.train_and_eval({x.name: X}, one_hot_label, {x.name: X}, one_hot_label)
 
-# exporter = Exporter()
-# sig = exporter.signature('img_input', 'softmax_output')
+exporter = Exporter()
+sig = exporter.signature('img_input', 'softmax_output')
 
 saver = ms.trainer.Saver('./epoches10')
 saver.save(model_file_name='my_model.json',

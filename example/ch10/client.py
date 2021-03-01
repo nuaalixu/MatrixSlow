@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     for index in range(len(test_data)):
         img = test_data[index]
-        label = test_label[index]
+        label = test_label.values[index]
         resp = client.Predict([img])
         resp_mat_list = []
         for proto_mat in resp.data:
@@ -60,5 +60,4 @@ if __name__ == '__main__':
             resp_mat_list.append(mat)
         pred = np.argmax(resp_mat_list[0])
         gt = label
-        print('model predict {} and ground truth: {}'.format(
-            np.argmax(pred.value), gt))
+        print('model predict {} and ground truth: {}'.format(pred, gt))
