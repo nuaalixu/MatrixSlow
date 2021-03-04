@@ -91,7 +91,7 @@ class Trainer(abc.ABC):
             self.one_step(self._get_input_values(train_x, i), train_y[i])
 
             if (i+1) % self.print_iteration_interval == 0:
-                print(f'-- iteration [{i}] finished, '
+                print(f'-- iteration [{i+1}] finished, '
                       f'time cost: {time.time() - last_iter_start_time:.2f} '
                       f'and loss value: {float(self.loss_op.value):4f}')
                 last_iter_start_time = time.time()
@@ -113,7 +113,7 @@ class Trainer(abc.ABC):
     def eval(self, test_x, test_y):
         """使用测试集进行评估
         """
-
+        eval_start_time = time.time()
         for metrics_op in self.metrics_ops:
             metrics_op.reset()
 
@@ -126,8 +126,10 @@ class Trainer(abc.ABC):
 
         metrics_str = f'Epoch [{self.epoch+1}] evaluation metrics'
         for metrics_op in self.metrics_ops:
-            metrics_str += metrics_op.value_str()
+            metrics_str += (metrics_op.value_str() + ',')
 
+        eval_end_time = time.time()
+        metrics_str += f' eval cost: {eval_end_time - eval_start_time:.2f}'
         print(metrics_str)
 
     def _get_input_values(self, x, index):

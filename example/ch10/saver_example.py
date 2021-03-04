@@ -17,21 +17,19 @@ from sklearn.preprocessing import OneHotEncoder
 import matrixslow as ms
 from matrixslow.trainer import SimpleTrainer
 from matrixslow_serving.exporter import Exporter
-
+from matrixslow.util import mnist
 
 # 加载MNIST数据集，取一部分样本并归一化
 
 # 输入图像尺寸
 img_shape = (28, 28)
 
-X, y = fetch_openml('mnist_784', version=1, return_X_y=True, cache=True)
-X, y = X[:100] / 255, y.astype(np.int)[:100]
-X = np.reshape(np.array(X), (100, *img_shape))
+X, y, _, _ = mnist('../../data')
+X, y = X[:100] / 255, y[:100]
 
-# 将整数形式的标签转换成One-Hot编码
-oh = OneHotEncoder(sparse=False)
-one_hot_label = oh.fit_transform(y.values.reshape(-1, 1))
+X = np.reshape(X, (100, *img_shape))
 
+one_hot_label = y
 
 # 输入图像
 x = ms.core.Variable(img_shape, init=False, trainable=False, name='img_input')
@@ -73,10 +71,11 @@ accuracy = ms.ops.metrics.Accuracy(output, one_hot)
 
 
 trainer = SimpleTrainer(
-    [x], one_hot, loss, optimizer, epoches=10, batch_size=32,
-    eval_on_train=True, metrics_ops=[accuracy])
+    [x], one_hot, loss, optimizer, epoches=20, batch_size=32,
+    eval_on_train=True, metrics_ops=[accuracy],
+    print_iteration_interval=50)
 
-trainer.train_and_eval({x.name: X}, one_hot_label, {x.name: X}, one_hot_label)
+trainer.train_and_eval({x.name: X}, one_hot_label, {x.name: X[:25]}, one_hot_label[:25])
 
 exporter = Exporter()
 sig = exporter.signature('img_input', 'softmax_output')
