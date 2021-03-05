@@ -26,7 +26,7 @@ class Node(abc.ABC):
         self.parents = list(parents)  # 父节点列表
         self.children = []  # 子节点列表
         self.value = None  # 本节点的值
-        self.jacobi = None  # 结果节点对本节点的雅可比矩阵，使用numpy.matrix实现
+        self.jacobi = None  # 结果节点对本节点的雅可比矩阵（梯度），使用numpy.matrix实现
 
         # 将本节点添加到父节点的子节点列表中
         for parent in self.parents:
@@ -139,7 +139,7 @@ class Variable(Node):
 
         # 如果需要初始化，则以正态分布随机初始化变量的值
         if init:
-            self.value = np.mat(np.random.normal(0, 0.001, self.dim))
+            self.value = np.mat(np.random.normal(0, 0.1, self.dim))
 
         # 变量节点是否参与训练
         self.trainable = trainable

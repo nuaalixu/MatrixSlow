@@ -24,12 +24,13 @@ from matrixslow.util import mnist
 # 输入图像尺寸
 img_shape = (28, 28)
 
-X, y, _, _ = mnist('../../data')
-X, y = X[:100] / 255, y[:100]
+X, y = fetch_openml('mnist_784', version=1, return_X_y=True, cache=True)
+X, y = X[:1000] / 255, y.values.astype(np.int)[:1000]
+X = np.reshape(np.array(X.values), (1000, *img_shape))
 
-X = np.reshape(X, (100, *img_shape))
-
-one_hot_label = y
+# 将整数形式的标签转换成One-Hot编码
+oh = OneHotEncoder(sparse=False)
+one_hot_label = oh.fit_transform(y.reshape(-1, 1))
 
 # 输入图像
 x = ms.core.Variable(img_shape, init=False, trainable=False, name='img_input')
@@ -62,18 +63,18 @@ predict = ms.ops.SoftMax(output, name='softmax_output')
 loss = ms.ops.loss.CrossEntropyWithSoftMax(output, one_hot)
 
 # 学习率
-learning_rate = 0.05
+learning_rate = 0.5
 
 # 优化器
-optimizer = ms.optimizer.RMSProp(ms.default_graph, loss, learning_rate)
+optimizer = ms.optimizer.GradientDescent(ms.default_graph, loss, learning_rate)
 
-accuracy = ms.ops.metrics.Accuracy(output, one_hot)
+accuracy = ms.ops.metrics.Accuracy(predict, one_hot)
 
 
 trainer = SimpleTrainer(
-    [x], one_hot, loss, optimizer, epoches=20, batch_size=32,
+    [x], one_hot, loss, optimizer, epoches=10, batch_size=32,
     eval_on_train=True, metrics_ops=[accuracy],
-    print_iteration_interval=50)
+    print_iteration_interval=32)
 
 trainer.train_and_eval({x.name: X}, one_hot_label, {x.name: X[:25]}, one_hot_label[:25])
 
