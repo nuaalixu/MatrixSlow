@@ -1,6 +1,6 @@
 {
     "meta": {
-        "save_time": "2021-03-05 13:57:57.730434",
+        "save_time": "2021-03-08 15:33:07.801321",
         "weights_file_name": "my_weights.npz"
     },
     "service": {
@@ -1166,8 +1166,7 @@
             ],
             "children": [
                 "softmax_output",
-                "CrossEntropyWithSoftMax:75",
-                "Accuracy:76"
+                "CrossEntropyWithSoftMax:75"
             ],
             "kargs": {},
             "dim": [
@@ -1181,8 +1180,14 @@
             "parents": [
                 "Add:73"
             ],
-            "children": [],
-            "kargs": {}
+            "children": [
+                "Accuracy:76"
+            ],
+            "kargs": {},
+            "dim": [
+                10,
+                1
+            ]
         },
         {
             "node_type": "CrossEntropyWithSoftMax",
