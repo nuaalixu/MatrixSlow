@@ -54,7 +54,7 @@ class Trainer(abc.ABC):
             assert len(test_x) == len(self.inputs)
 
         # 初始化权值变量
-        self._variable_weight_init()
+        self._variable_weights_init()
         print('[INIT] Variable weights init finished')
 
         # 传入数据，开始主循环
@@ -165,7 +165,7 @@ class Trainer(abc.ABC):
             self.optimizer.one_step()
 
     @abc.abstractmethod
-    def _variable_weight_init(self):
+    def _variable_weights_init(self):
         """权值变量初始化，具体的初始化由子类完成
         """
         raise NotImplementedError()

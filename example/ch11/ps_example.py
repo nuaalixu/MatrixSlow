@@ -24,12 +24,12 @@ import numpy as np
 
 cluster_conf = {
     "ps": [
-        "app07.add.shyc2.qihoo.net:5000"
+        "localhost:5000"
     ],
     "workers": [
-        "app07.add.shyc2.qihoo.net:6000",
-        "app08.add.shyc2.qihoo.net:6002",
-        "app09.add.shyc2.qihoo.net:6004"
+        "localhost:5001",
+        "localhost:5002",
+        "localhost:5003"
     ]
 }
 
@@ -42,14 +42,14 @@ def train(worker_index):
     X, y = fetch_openml('mnist_784', version=1, return_X_y=True, cache=True)
 
     start = worker_index * 1000
-    end = (worker_index + 1)* 1000
+    end = (worker_index + 1) * 1000
 
     X, y = X[start:end] / 255, y.astype(np.int)[start:end]
     X = np.reshape(np.array(X), (1000, *img_shape))
 
     # 将整数形式的标签转换成One-Hot编码
     oh = OneHotEncoder(sparse=False)
-    one_hot_label = oh.fit_transform(y.reshape(-1, 1))
+    one_hot_label = oh.fit_transform(y.values.reshape(-1, 1))
 
     # 输入图像
     x = ms.core.Variable(img_shape, init=False,
@@ -74,7 +74,7 @@ def train(worker_index):
     fc1 = ms.layer.fc(ms.ops.Concat(*pooling2), 147, 120, "ReLU")
 
     # 输出层
-    output = ms.layer.fc(fc1, 120, 10, "None")
+    output = ms.layer.fc(fc1, 120, 10, None)
 
     # 分类概率
     predict = ms.ops.SoftMax(output, name='softmax_output')

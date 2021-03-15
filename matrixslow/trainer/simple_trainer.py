@@ -10,7 +10,7 @@ class SimpleTrainer(Trainer):
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
 
-    def _variable_weight_init(self):
+    def _variable_weights_init(self):
         """不做统一的初始化操作，即使用节点本身的初始化方法。
         """
 

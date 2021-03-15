@@ -13,6 +13,7 @@ sys.path.append('../')
 import matplotlib
 matplotlib.use('TkAgg')
 
+import numpy as np
 import grpc
 import matrixslow_serving as mss
 from matrixslow.util import *
